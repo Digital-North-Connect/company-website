@@ -11,7 +11,7 @@ export const Hero: React.FC = () => {
       overflow: 'hidden',
       paddingTop: '64px',
     }}>
-      <svg style={{
+      <svg className="constellation-svg" style={{
         position: 'absolute',
         inset: 0,
         width: '100%',
@@ -81,7 +81,7 @@ export const Hero: React.FC = () => {
           </radialGradient>
         </defs>
 
-        <circle cx="50%" cy="18%" r="70" fill="url(#starGlow)" />
+        <circle className="star-glow" cx="50%" cy="18%" r="70" fill="url(#starGlow)" />
 
         <polygon
           points="50,8 51,16 50,18 49,16"
@@ -224,6 +224,20 @@ export const Hero: React.FC = () => {
           66% {
             transform: translateX(30px) scaleX(0.92);
             opacity: 0.8;
+          }
+        }
+        @media (max-width: 768px) {
+          h1 {
+            font-size: 36px !important;
+          }
+          p {
+            font-size: 18px !important;
+          }
+          .constellation-svg {
+            opacity: 0.55 !important;
+          }
+          .star-glow {
+            r: 100;
           }
         }
       `}</style>

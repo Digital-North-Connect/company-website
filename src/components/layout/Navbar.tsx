@@ -20,8 +20,11 @@ export const Navbar: React.FC = () => {
             }}>
               <span style={{ color: 'white', fontWeight: 'bold', fontSize: '20px' }}>DN</span>
             </div>
-            <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827' }}>
+            <span className="company-name" style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827' }}>
               Digital North Connect
+            </span>
+            <span className="company-name-short" style={{ fontSize: '18px', fontWeight: 'bold', color: '#111827', display: 'none' }}>
+              DNC
             </span>
           </Link>
 
@@ -91,6 +94,10 @@ export const Navbar: React.FC = () => {
       <style>{`
         @media (max-width: 768px) {
           .desktop-nav { display: none; }
+        }
+        @media (max-width: 600px) {
+          .company-name { display: none; }
+          .company-name-short { display: inline !important; }
         }
         @media (min-width: 769px) {
           .mobile-nav-button { display: none; }
