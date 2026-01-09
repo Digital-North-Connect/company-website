@@ -101,7 +101,17 @@ export const HowWeWork: React.FC = () => {
                 {/* Step Card */}
                 <div
                   className="relative bg-white rounded-2xl border border-slate-200/80 shadow-sm"
-                  style={{ padding: '24px 24px 28px 24px', flex: 1 }}
+                  style={{ padding: '24px 24px 28px 24px', flex: 1, transition: 'all 0.2s ease', cursor: 'default' }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.08)';
+                    e.currentTarget.style.borderColor = '#cbd5e1';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '';
+                    e.currentTarget.style.borderColor = '';
+                  }}
                 >
                   {/* Number Badge */}
                   <div

@@ -121,7 +121,17 @@ export const CoreValues: React.FC = () => {
             <div
               key={index}
               className="relative bg-white rounded-2xl border border-slate-200/80 shadow-sm"
-              style={{ padding: '28px 28px 32px 28px' }}
+              style={{ padding: '28px 28px 32px 28px', transition: 'all 0.2s ease', cursor: 'default' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.08)';
+                e.currentTarget.style.borderColor = '#cbd5e1';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '';
+                e.currentTarget.style.borderColor = '';
+              }}
             >
               {/* Icon */}
               <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${value.bgGradient} flex items-center justify-center mb-6`}>
