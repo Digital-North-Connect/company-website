@@ -1,77 +1,64 @@
 interface PageHeroProps {
   title: string;
   subtitle: string;
-  paddingTop?: string;
-  paddingBottom?: string;
-  titleSize?: string;
-  subtitleSize?: string;
-  maxWidth?: string;
-  showAurora?: boolean;
 }
 
-export const PageHero: React.FC<PageHeroProps> = ({
-  title,
-  subtitle,
-  paddingTop = '120px',
-  paddingBottom = '80px',
-  titleSize = '48px',
-  subtitleSize = '20px',
-  maxWidth = '900px',
-  showAurora = true
-}) => {
+export const PageHero: React.FC<PageHeroProps> = ({ title, subtitle }) => {
   return (
-    <section style={{
-      paddingTop,
-      paddingBottom,
-      background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%)',
-      color: 'white',
-      position: 'relative',
-      overflow: 'hidden'
-    }}>
-      {showAurora && (
-        <div style={{ position: 'absolute', inset: 0, opacity: 0.15 }}>
-          <div style={{
-            position: 'absolute',
-            top: '0',
-            left: '20%',
-            width: '300px',
-            height: '100%',
-            background: 'linear-gradient(to bottom, transparent 0%, #10b981 50%, transparent 100%)',
-            filter: 'blur(80px)',
-          }}></div>
-          <div style={{
-            position: 'absolute',
-            top: '0',
-            right: '20%',
-            width: '300px',
-            height: '100%',
-            background: 'linear-gradient(to bottom, transparent 0%, #3b82f6 50%, transparent 100%)',
-            filter: 'blur(80px)',
-          }}></div>
-        </div>
-      )}
+    <section className="relative overflow-hidden" style={{ paddingTop: '120px', paddingBottom: '80px' }}>
+      {/* Mesh Gradient Background */}
+      <div className="absolute inset-0 gradient-mesh" />
 
-      <div style={{
-        maxWidth,
-        margin: '0 auto',
-        paddingLeft: '24px',
-        paddingRight: '24px',
-        textAlign: 'center',
-        position: 'relative',
-        zIndex: 1
-      }}>
-        <h1 style={{
-          fontSize: titleSize,
-          fontWeight: '700',
-          marginBottom: '20px',
-          textShadow: '0 0 30px rgba(16, 185, 129, 0.4)'
-        }}>
-          {title}
-        </h1>
-        <p style={{ fontSize: subtitleSize, color: '#cbd5e1', lineHeight: '1.7' }}>
-          {subtitle}
-        </p>
+      {/* Content */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          width: '100%',
+          maxWidth: '1200px',
+          margin: '0 auto',
+          padding: '0 6%',
+        }}
+      >
+        <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
+          {/* Title */}
+          <h1
+            style={{
+              fontSize: 'clamp(2rem, 5vw, 3rem)',
+              fontWeight: '600',
+              color: 'white',
+              letterSpacing: '-0.02em',
+              lineHeight: '1.2',
+              marginBottom: '24px',
+            }}
+          >
+            {title.split(' ').map((word, i) => {
+              if (word.toLowerCase() === 'north' || word.toLowerCase() === 'star') {
+                return (
+                  <span key={i} className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                    {word}{' '}
+                  </span>
+                );
+              }
+              return word + ' ';
+            })}
+          </h1>
+
+          {/* Subtitle */}
+          <p
+            style={{
+              fontSize: '1.0625rem',
+              color: '#cbd5e1',
+              lineHeight: '1.75',
+            }}
+          >
+            {subtitle}
+          </p>
+        </div>
       </div>
+
+      {/* Bottom Fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent" />
     </section>
   );
 };

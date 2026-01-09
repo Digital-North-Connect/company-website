@@ -1,62 +1,67 @@
 export const CTASection: React.FC = () => {
   return (
-    <section style={{ paddingTop: '80px', paddingBottom: '80px', background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%)', color: 'white', position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.15 }}>
-        <div style={{
-          position: 'absolute',
-          top: '0',
-          left: '20%',
-          width: '300px',
-          height: '100%',
-          background: 'linear-gradient(to bottom, transparent 0%, #10b981 50%, transparent 100%)',
-          filter: 'blur(80px)',
-        }}></div>
-        <div style={{
-          position: 'absolute',
-          top: '0',
-          right: '20%',
-          width: '300px',
-          height: '100%',
-          background: 'linear-gradient(to bottom, transparent 0%, #3b82f6 50%, transparent 100%)',
-          filter: 'blur(80px)',
-        }}></div>
-      </div>
+    <section className="relative overflow-hidden" style={{ paddingTop: '48px', paddingBottom: '72px' }}>
+      {/* Background */}
+      <div className="absolute inset-0 gradient-mesh" />
 
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingLeft: '24px', paddingRight: '24px', textAlign: 'center', maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-        <h2 style={{ fontSize: '36px', fontWeight: '700', marginBottom: '16px', textShadow: '0 0 30px rgba(16, 185, 129, 0.4)' }}>
-          Ready to Navigate to Your North Star?
-        </h2>
-        <p style={{ fontSize: '18px', color: '#cbd5e1', lineHeight: '1.6', marginBottom: '32px' }}>
-          Let's connect and chart the course to your goals. Reach out today to start the conversation.
-        </p>
-        <a
-          href="mailto:digital.north.connect@gmail.com"
-          style={{
-            display: 'inline-block',
-            padding: '14px 32px',
-            background: 'linear-gradient(135deg, #10b981, #34d399)',
-            color: 'white',
-            borderRadius: '8px',
-            fontWeight: '600',
-            fontSize: '16px',
-            textDecoration: 'none',
-            boxShadow: '0 0 25px rgba(16, 185, 129, 0.3), 0 10px 25px -5px rgb(0 0 0 / 0.25)',
-            transition: 'all 0.3s',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'linear-gradient(135deg, #34d399, #10b981)';
-            e.currentTarget.style.boxShadow = '0 0 40px rgba(16, 185, 129, 0.6), 0 25px 50px -12px rgb(0 0 0 / 0.4)';
-            e.currentTarget.style.transform = 'translateY(-2px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'linear-gradient(135deg, #10b981, #34d399)';
-            e.currentTarget.style.boxShadow = '0 0 30px rgba(16, 185, 129, 0.4), 0 20px 40px -10px rgb(0 0 0 / 0.3)';
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
-        >
-          Connect With Us
-        </a>
+      {/* Content */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          width: '100%',
+          maxWidth: '1200px',
+          margin: '0 auto',
+          padding: '0 6%',
+        }}
+      >
+        <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
+          {/* Heading */}
+          <h2
+            style={{
+              fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
+              fontWeight: '600',
+              color: 'white',
+              letterSpacing: '-0.02em',
+              lineHeight: '1.2',
+              marginBottom: '20px',
+            }}
+          >
+            Ready to Navigate to Your{' '}
+            <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+              North Star?
+            </span>
+          </h2>
+
+          {/* Description */}
+          <p
+            style={{
+              fontSize: 'clamp(1rem, 1.5vw, 1.125rem)',
+              color: '#cbd5e1',
+              lineHeight: '1.7',
+              marginBottom: '32px',
+            }}
+          >
+            Let's talk about what you're building. Free 30-minute call, no strings attached.
+          </p>
+
+          {/* CTA Button */}
+          <a
+            href="mailto:matt@digitalnorthconnect.com"
+            className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl"
+            style={{ padding: '16px 32px' }}
+          >
+            <span>Start Your Journey</span>
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
+
+          {/* Trust Note */}
+          <p style={{ marginTop: '24px', fontSize: '14px', color: '#94a3b8' }}>
+            No sales pitch. Just a real conversation.
+          </p>
+        </div>
       </div>
     </section>
   );

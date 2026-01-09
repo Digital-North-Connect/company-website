@@ -16,10 +16,10 @@ export const About = () => {
       <meta property="og:description" content="Enterprise-level software development expertise for growing businesses" />
       <meta property="og:type" content="website" />
 
-      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div className="min-h-screen flex flex-col">
         <Navbar />
 
-        <main style={{ flex: 1 }}>
+        <main className="flex-1">
           <PageHero
             title="Guiding Your Business to Its North Star"
             subtitle="We're not just another software agency. We're your trusted navigation partner, bringing enterprise-caliber engineering to growing businesses."

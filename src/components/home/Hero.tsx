@@ -1,330 +1,372 @@
+import { useEffect, useRef } from 'react';
+
 export const Hero: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Star constellation points
+    const stars: { x: number; y: number; size: number; opacity: number; twinkleSpeed: number }[] = [];
+    const numStars = 80;
+
+    for (let i = 0; i < numStars; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 2 + 0.5,
+        opacity: Math.random() * 0.5 + 0.3,
+        twinkleSpeed: Math.random() * 0.02 + 0.01,
+      });
+    }
+
+    // North star position
+    const northStar = {
+      x: canvas.width * 0.5,
+      y: canvas.height * 0.15,
+    };
+
+    let time = 0;
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      time += 0.01;
+
+      // Draw connections from some stars toward north star
+      stars.forEach((star, i) => {
+        if (i % 4 === 0) {
+          const gradient = ctx.createLinearGradient(star.x, star.y, northStar.x, northStar.y);
+          gradient.addColorStop(0, `rgba(255, 255, 255, ${star.opacity * 0.3})`);
+          gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+          ctx.beginPath();
+          ctx.moveTo(star.x, star.y);
+          ctx.lineTo(northStar.x, northStar.y);
+          ctx.strokeStyle = gradient;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      });
+
+      // Draw stars with twinkle effect
+      stars.forEach((star) => {
+        const twinkle = Math.sin(time * star.twinkleSpeed * 100) * 0.3 + 0.7;
+
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity * twinkle})`;
+        ctx.fill();
+      });
+
+      // Draw North Star with glow
+      const glowSize = 60 + Math.sin(time * 2) * 10;
+      const northStarGradient = ctx.createRadialGradient(
+        northStar.x, northStar.y, 0,
+        northStar.x, northStar.y, glowSize
+      );
+      northStarGradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      northStarGradient.addColorStop(0.1, 'rgba(255, 255, 255, 0.8)');
+      northStarGradient.addColorStop(0.3, 'rgba(96, 165, 250, 0.4)');
+      northStarGradient.addColorStop(0.6, 'rgba(139, 92, 246, 0.2)');
+      northStarGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+      ctx.beginPath();
+      ctx.arc(northStar.x, northStar.y, glowSize, 0, Math.PI * 2);
+      ctx.fillStyle = northStarGradient;
+      ctx.fill();
+
+      // Draw North Star rays
+      const rayLength = 25 + Math.sin(time * 3) * 5;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.lineWidth = 2;
+
+      for (let i = 0; i < 4; i++) {
+        const angle = (i * Math.PI / 2) + time * 0.1;
+        ctx.beginPath();
+        ctx.moveTo(northStar.x, northStar.y);
+        ctx.lineTo(
+          northStar.x + Math.cos(angle) * rayLength,
+          northStar.y + Math.sin(angle) * rayLength
+        );
+        ctx.stroke();
+      }
+
+      // Diagonal rays
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 4; i++) {
+        const angle = (i * Math.PI / 2) + Math.PI / 4 + time * 0.1;
+        ctx.beginPath();
+        ctx.moveTo(northStar.x, northStar.y);
+        ctx.lineTo(
+          northStar.x + Math.cos(angle) * (rayLength * 0.7),
+          northStar.y + Math.sin(angle) * (rayLength * 0.7)
+        );
+        ctx.stroke();
+      }
+
+      // Center dot
+      ctx.beginPath();
+      ctx.arc(northStar.x, northStar.y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = 'white';
+      ctx.fill();
+
+      requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, []);
+
   return (
-    <section style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 20%, #10b981 40%, #3b82f6 60%, #7c3aed 80%, #1e293b 100%)',
-      color: 'white',
-      position: 'relative',
-      overflow: 'hidden',
-      paddingTop: '64px',
-    }}>
-      <svg className="constellation-svg" style={{
-        position: 'absolute',
-        inset: 0,
-        width: '100%',
-        height: '100%',
-        opacity: 0.35,
-      }}>
-        <line x1="3%" y1="94%" x2="12%" y2="79%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-        <line x1="31%" y1="96%" x2="44%" y2="82%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-        <line x1="59%" y1="91%" x2="71%" y2="73%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-        <line x1="87%" y1="93%" x2="95%" y2="77%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+      {/* Mesh Gradient Background */}
+      <div className="absolute inset-0 gradient-mesh" />
 
-        <line x1="12%" y1="79%" x2="7%" y2="61%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-        <line x1="12%" y1="79%" x2="23%" y2="64%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-        <line x1="44%" y1="82%" x2="52%" y2="67%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-        <line x1="71%" y1="73%" x2="79%" y2="58%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-        <line x1="95%" y1="77%" x2="91%" y2="59%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-
-        <line x1="7%" y1="61%" x2="16%" y2="43%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-        <line x1="23%" y1="64%" x2="33%" y2="51%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-        <line x1="52%" y1="67%" x2="58%" y2="48%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-        <line x1="79%" y1="58%" x2="73%" y2="39%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-        <line x1="91%" y1="59%" x2="84%" y2="44%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-
-        <line x1="16%" y1="43%" x2="27%" y2="31%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-        <line x1="33%" y1="51%" x2="39%" y2="34%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-        <line x1="58%" y1="48%" x2="50%" y2="18%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-        <line x1="73%" y1="39%" x2="66%" y2="27%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-        <line x1="84%" y1="44%" x2="73%" y2="39%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-
-        <line x1="27%" y1="31%" x2="50%" y2="18%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-        <line x1="39%" y1="34%" x2="50%" y2="18%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-        <line x1="66%" y1="27%" x2="50%" y2="18%" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1.5" />
-
-        <circle cx="3%" cy="94%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-        <circle cx="31%" cy="96%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-        <circle cx="59%" cy="91%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-        <circle cx="87%" cy="93%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-
-        <circle cx="12%" cy="79%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-        <circle cx="44%" cy="82%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-        <circle cx="71%" cy="73%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-        <circle cx="95%" cy="77%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-
-        <circle cx="7%" cy="61%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-        <circle cx="23%" cy="64%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-        <circle cx="52%" cy="67%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-        <circle cx="79%" cy="58%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-        <circle cx="91%" cy="59%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-
-        <circle cx="16%" cy="43%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-        <circle cx="33%" cy="51%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-        <circle cx="58%" cy="48%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-        <circle cx="73%" cy="39%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-        <circle cx="84%" cy="44%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-
-        <circle cx="27%" cy="31%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-        <circle cx="39%" cy="34%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-        <circle cx="66%" cy="27%" r="5" fill="rgba(255, 255, 255, 0.85)" />
-
-        <defs>
-          <radialGradient id="starGlow">
-            <stop offset="0%" stopColor="rgba(255, 255, 255, 1)" />
-            <stop offset="20%" stopColor="rgba(255, 255, 255, 0.9)" />
-            <stop offset="40%" stopColor="rgba(255, 255, 255, 0.6)" />
-            <stop offset="70%" stopColor="rgba(255, 255, 255, 0.3)" />
-            <stop offset="100%" stopColor="rgba(255, 255, 255, 0)" />
-          </radialGradient>
-        </defs>
-
-        <circle className="star-glow" cx="50%" cy="18%" r="70" fill="url(#starGlow)" />
-
-        <polygon
-          points="50,8 51,16 50,18 49,16"
-          fill="rgba(255, 255, 255, 1)"
+      {/* Animated Aurora Effect */}
+      <div className="absolute inset-0 overflow-hidden opacity-40">
+        <div
+          className="absolute top-0 left-[5%] w-[300px] h-full"
+          style={{
+            background: 'linear-gradient(to bottom, transparent 0%, rgba(59, 130, 246, 0.3) 20%, rgba(16, 185, 129, 0.4) 50%, rgba(139, 92, 246, 0.3) 80%, transparent 100%)',
+            filter: 'blur(60px)',
+            animation: 'aurora 15s ease-in-out infinite',
+          }}
         />
-        <polygon
-          points="50,28 51,20 50,18 49,20"
-          fill="rgba(255, 255, 255, 1)"
+        <div
+          className="absolute top-0 left-[30%] w-[250px] h-full"
+          style={{
+            background: 'linear-gradient(to bottom, transparent 0%, rgba(16, 185, 129, 0.35) 25%, rgba(6, 182, 212, 0.4) 50%, rgba(59, 130, 246, 0.3) 75%, transparent 100%)',
+            filter: 'blur(70px)',
+            animation: 'aurora 18s ease-in-out infinite 3s',
+          }}
         />
-        <polygon
-          points="38,18 46,19 50,18 46,17"
-          fill="rgba(255, 255, 255, 1)"
+        <div
+          className="absolute top-0 right-[20%] w-[280px] h-full"
+          style={{
+            background: 'linear-gradient(to bottom, transparent 0%, rgba(139, 92, 246, 0.3) 20%, rgba(59, 130, 246, 0.4) 55%, rgba(16, 185, 129, 0.3) 85%, transparent 100%)',
+            filter: 'blur(65px)',
+            animation: 'aurora 20s ease-in-out infinite 6s',
+          }}
         />
-        <polygon
-          points="62,18 54,19 50,18 54,17"
-          fill="rgba(255, 255, 255, 1)"
+        <div
+          className="absolute top-0 right-[5%] w-[220px] h-full"
+          style={{
+            background: 'linear-gradient(to bottom, transparent 0%, rgba(6, 182, 212, 0.3) 30%, rgba(139, 92, 246, 0.35) 60%, rgba(16, 185, 129, 0.25) 90%, transparent 100%)',
+            filter: 'blur(55px)',
+            animation: 'aurora 16s ease-in-out infinite 9s',
+          }}
         />
-
-        <polygon
-          points="58,11 52,16 50,18 51,19"
-          fill="rgba(255, 255, 255, 0.95)"
-        />
-        <polygon
-          points="58,25 52,20 50,18 51,17"
-          fill="rgba(255, 255, 255, 0.95)"
-        />
-        <polygon
-          points="42,25 48,20 50,18 49,17"
-          fill="rgba(255, 255, 255, 0.95)"
-        />
-        <polygon
-          points="42,11 48,16 50,18 49,19"
-          fill="rgba(255, 255, 255, 0.95)"
-        />
-
-        <circle cx="50%" cy="18%" r="5" fill="rgba(255, 255, 255, 1)" />
-
-        <circle cx="50%" cy="18%" r="8" fill="rgba(255, 255, 255, 0.6)" />
-      </svg>
-
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.4, overflow: 'hidden' }}>
-        <div style={{
-          position: 'absolute',
-          top: '0',
-          left: '10%',
-          width: '200px',
-          height: '100%',
-          background: 'linear-gradient(to bottom, transparent 0%, #10b981 20%, #34d399 50%, #fb7185 85%, transparent 100%)',
-          filter: 'blur(40px)',
-          animation: 'auroraDance1 12s ease-in-out infinite',
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          top: '0',
-          left: '35%',
-          width: '180px',
-          height: '100%',
-          background: 'linear-gradient(to bottom, transparent 0%, #34d399 15%, #10b981 45%, #ec4899 80%, transparent 100%)',
-          filter: 'blur(45px)',
-          animation: 'auroraDance2 15s ease-in-out infinite 2s',
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          top: '0',
-          right: '25%',
-          width: '220px',
-          height: '100%',
-          background: 'linear-gradient(to bottom, transparent 0%, #3b82f6 18%, #7c3aed 55%, #10b981 88%, transparent 100%)',
-          filter: 'blur(50px)',
-          animation: 'auroraDance3 18s ease-in-out infinite 4s',
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          top: '0',
-          right: '8%',
-          width: '190px',
-          height: '100%',
-          background: 'linear-gradient(to bottom, transparent 0%, #10b981 22%, #34d399 60%, #a78bfa 90%, transparent 100%)',
-          filter: 'blur(42px)',
-          animation: 'auroraDance1 14s ease-in-out infinite 6s',
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          top: '0',
-          left: '55%',
-          width: '160px',
-          height: '100%',
-          background: 'linear-gradient(to bottom, transparent 0%, #60a5fa 25%, #10b981 50%, #fb7185 82%, transparent 100%)',
-          filter: 'blur(48px)',
-          animation: 'auroraDance2 16s ease-in-out infinite 8s',
-        }}></div>
       </div>
 
-      <style>{`
-        @keyframes auroraDance1 {
-          0%, 100% {
-            transform: translateX(0) scaleX(1);
-            opacity: 0.8;
-          }
-          25% {
-            transform: translateX(-30px) scaleX(1.15);
-            opacity: 1;
-          }
-          50% {
-            transform: translateX(20px) scaleX(0.9);
-            opacity: 0.7;
-          }
-          75% {
-            transform: translateX(-15px) scaleX(1.1);
-            opacity: 0.9;
-          }
-        }
-        @keyframes auroraDance2 {
-          0%, 100% {
-            transform: translateX(0) scaleX(1);
-            opacity: 0.7;
-          }
-          30% {
-            transform: translateX(40px) scaleX(1.2);
-            opacity: 0.95;
-          }
-          60% {
-            transform: translateX(-25px) scaleX(0.85);
-            opacity: 0.65;
-          }
-        }
-        @keyframes auroraDance3 {
-          0%, 100% {
-            transform: translateX(0) scaleX(1);
-            opacity: 0.75;
-          }
-          33% {
-            transform: translateX(-35px) scaleX(1.18);
-            opacity: 1;
-          }
-          66% {
-            transform: translateX(30px) scaleX(0.92);
-            opacity: 0.8;
-          }
-        }
-        @media (max-width: 768px) {
-          h1 {
-            font-size: 36px !important;
-          }
-          p {
-            font-size: 18px !important;
-          }
-          .constellation-svg {
-            opacity: 0.55 !important;
-          }
-          .star-glow {
-            r: 100;
-          }
-        }
-      `}</style>
+      {/* Animated Canvas for Stars */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 opacity-60"
+        style={{ pointerEvents: 'none' }}
+      />
 
-      <div style={{ width: '100%', maxWidth: '1280px', margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 10, paddingTop: '80px' }}>
-        <div style={{ textAlign: 'center', maxWidth: '896px', margin: '0 auto' }}>
-          <h1 style={{
-            fontSize: '56px',
-            fontWeight: 'bold',
-            marginBottom: '24px',
-            lineHeight: '1.2',
-            color: '#ffffff',
-            textShadow: '0 0 40px rgba(16, 185, 129, 0.6), 0 0 80px rgba(59, 130, 246, 0.4), 0 4px 20px rgba(0, 0, 0, 0.5)',
-          }}>
-            Find Your North Star. Connect to the Right Solutions.
-          </h1>
-          <p style={{ fontSize: '20px', marginBottom: '40px', color: '#e0f2fe', lineHeight: '1.75', textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)' }}>
-            Every business has a guiding vision—a North Star that defines where you're heading. We help you navigate the path forward by connecting you with enterprise-grade software and cloud solutions that align with your goals.
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a
-              href="mailto:digital.north.connect@gmail.com"
+      {/* Content */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '25vh 6% 80px 6%',
+        }}
+      >
+        <div
+          style={{
+            textAlign: 'center',
+            maxWidth: '900px',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          {/* Main Heading */}
+          <h1
+            style={{
+              fontSize: 'clamp(2rem, 5vw, 3.25rem)',
+              fontWeight: '600',
+              color: 'white',
+              lineHeight: '1.2',
+              marginBottom: '32px',
+              letterSpacing: '-0.02em',
+            }}
+          >
+            Find Your{' '}
+            <span
               style={{
-                padding: '16px 32px',
-                background: 'linear-gradient(135deg, #10b981, #34d399)',
-                color: 'white',
-                borderRadius: '8px',
-                fontWeight: '600',
-                fontSize: '18px',
-                textDecoration: 'none',
-                display: 'inline-block',
-                boxShadow: '0 0 20px rgba(16, 185, 129, 0.4), 0 10px 15px -3px rgb(0 0 0 / 0.3)',
-                transition: 'all 0.3s',
-                border: '2px solid rgba(255, 255, 255, 0.3)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'linear-gradient(135deg, #34d399, #10b981)';
-                e.currentTarget.style.boxShadow = '0 0 30px rgba(16, 185, 129, 0.6), 0 15px 25px -5px rgb(0 0 0 / 0.4)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'linear-gradient(135deg, #10b981, #34d399)';
-                e.currentTarget.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.4), 0 10px 15px -3px rgb(0 0 0 / 0.3)';
-                e.currentTarget.style.transform = 'translateY(0)';
+                background: 'linear-gradient(90deg, #60a5fa, #22d3ee, #34d399)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
               }}
             >
-              Connect With Us
+              North Star
+            </span>
+            <br />
+            Connect to the Right Solutions
+          </h1>
+
+          {/* Subheading */}
+          <p
+            style={{
+              fontSize: 'clamp(1.1rem, 2vw, 1.25rem)',
+              color: '#cbd5e1',
+              lineHeight: '1.8',
+              maxWidth: '700px',
+              marginBottom: '48px',
+            }}
+          >
+            You have a vision for where your business needs to go. We build the software
+            and cloud infrastructure to get you there.
+          </p>
+
+          {/* CTA Buttons */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              gap: '16px',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginBottom: '64px',
+            }}
+          >
+            <a
+              href="mailto:matt@digitalnorthconnect.com"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '16px 32px',
+                background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                color: 'white',
+                fontWeight: '600',
+                fontSize: '16px',
+                borderRadius: '12px',
+                textDecoration: 'none',
+                boxShadow: '0 4px 20px rgba(59, 130, 246, 0.4)',
+                transition: 'all 0.3s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0 8px 30px rgba(59, 130, 246, 0.5)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 20px rgba(59, 130, 246, 0.4)';
+              }}
+            >
+              Start Your Journey
+              <svg style={{ width: '20px', height: '20px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
             </a>
             <a
               href="#services"
+              className="glass-dark"
               style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '10px',
                 padding: '16px 32px',
-                background: 'rgba(255, 255, 255, 0.15)',
                 color: 'white',
-                borderRadius: '8px',
                 fontWeight: '600',
-                fontSize: '18px',
+                fontSize: '16px',
+                borderRadius: '12px',
                 textDecoration: 'none',
-                display: 'inline-block',
-                boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.2)',
                 transition: 'all 0.3s',
-                border: '2px solid rgba(255, 255, 255, 0.4)',
-                backdropFilter: 'blur(10px)',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
-                e.currentTarget.style.boxShadow = '0 0 25px rgba(255, 255, 255, 0.3), 0 15px 25px -5px rgb(0 0 0 / 0.3)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.15)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                e.currentTarget.style.boxShadow = '0 10px 15px -3px rgb(0 0 0 / 0.2)';
                 e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.background = '';
               }}
             >
               Explore Solutions
-            </a>
-          </div>
-
-          <div style={{ marginTop: '80px', animation: 'bounce 1s infinite' }}>
-            <a href="#services" style={{ display: 'inline-block' }}>
-              <svg style={{ width: '24px', height: '24px', color: 'white' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg style={{ width: '20px', height: '20px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
               </svg>
             </a>
           </div>
+
+          {/* Trust Indicators */}
+          <div
+            style={{
+              paddingTop: '32px',
+              borderTop: '1px solid rgba(255,255,255,0.1)',
+              width: '100%',
+            }}
+          >
+            <p style={{ fontSize: '14px', color: '#94a3b8', marginBottom: '24px' }}>
+              Built with experience from
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '32px',
+                opacity: 0.7,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#cbd5e1' }}>
+                <svg style={{ width: '24px', height: '24px' }} viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                </svg>
+                <span style={{ fontWeight: '500' }}>Enterprise Scale</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#cbd5e1' }}>
+                <svg style={{ width: '24px', height: '24px' }} viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+                </svg>
+                <span style={{ fontWeight: '500' }}>AWS Certified</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#cbd5e1' }}>
+                <svg style={{ width: '24px', height: '24px' }} viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                </svg>
+                <span style={{ fontWeight: '500' }}>Secure & Reliable</span>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Scroll Indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-[bounce-subtle_2s_ease-in-out_infinite] z-20">
+        <a href="#services" className="flex flex-col items-center gap-2 text-slate-400 hover:text-white transition-colors">
+          <span className="text-xs uppercase tracking-wider">Scroll</span>
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        </a>
       </div>
     </section>
   );
